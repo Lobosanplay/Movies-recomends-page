@@ -1,94 +1,75 @@
-import { useEffect, useState, useRef } from "react";
-import { search } from "../../services/searchNamesMovies.service";
-
-interface Option {
-  label: string;
-  select: string;
-  text: string;
-  placeholder1: string;
-  placeholder2?: string;
-}
-
-interface Movie {
-  movie_id: number;
-  title: string;
-}
+import { useEffect, useRef } from "react";
+import type { Option } from "../../models/options.model";
+import { useMovieSearch } from "../../hooks/useMovieSearch";
 
 export default function FormOption(option: Option) {
     const isCompareMode = option.select === 'compare';
     const isSearchTagMode = option.select === 'tag';
-    const [value, setValue] = useState<string>('');
-    const [suggestions, setSuggestions] = useState<Movie[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
     
-    const [debouncedValue, setDebouncedValue] = useState<string>('');
+    const firstInput = useMovieSearch('', isSearchTagMode);
+    const secondInput = useMovieSearch('', false);
 
-    const dropdownRef = useRef<HTMLDivElement>(null);
-    const inputRef = useRef<HTMLInputElement>(null);
-
-    useEffect(() => {
-        const timer = setTimeout(() => {
-        setDebouncedValue(value);
-        }, 300); 
-
-        return () => clearTimeout(timer);
-    }, [value]);
-
-    useEffect(() => {
-        const fetchSuggestions = async () => {
-        if (debouncedValue.trim().length < 2) { 
-            setSuggestions([]);
-            return;
-        }
-
-        setLoading(true);
-        try {
-            const data = await search(debouncedValue);
-            setSuggestions(data.movies || []);
-            setShowSuggestions(true);
-        } catch (error) {
-            console.error("Error fetching suggestions:", error);
-            setSuggestions([]);
-        } finally {
-            setLoading(false);
-        }
-        };
-
-        fetchSuggestions();
-    }, [debouncedValue]);
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setValue(e.target.value);
-    };
+    const dropdownRefFirst = useRef<HTMLDivElement>(null);
+    const dropdownRefSecond = useRef<HTMLDivElement>(null);
+    const inputRefFirst = useRef<HTMLInputElement>(null);
+    const inputRefSecond = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                setShowSuggestions(false);
+            const target = event.target as Node;
+            
+            if (dropdownRefFirst.current && !dropdownRefFirst.current.contains(target)) {
+                firstInput.setShowSuggestions(false);
+            }
+            
+            if (dropdownRefSecond.current && !dropdownRefSecond.current.contains(target)) {
+                secondInput.setShowSuggestions(false);
             }
         };
         
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+    }, [firstInput, secondInput]);
 
-
-    const handleSuggestionClick = (movieTitle: string) => {
-        setValue(movieTitle);
-        setSuggestions([]);
-        setShowSuggestions(false);
+    const handleChangeFirst = (e: React.ChangeEvent<HTMLInputElement>) => {
+        firstInput.setValue(e.target.value);
+        firstInput.setShowSuggestions(true);
     };
 
-    const handleInputBlur = () => {
+    const handleChangeSecond = (e: React.ChangeEvent<HTMLInputElement>) => {
+        secondInput.setValue(e.target.value);
+        secondInput.setShowSuggestions(true);
+    };
+
+    const handleSuggestionClickFirst = (selectedValue: string) => {
+        firstInput.setValue(selectedValue);
+        firstInput.setShowSuggestions(false);
+    };
+
+    const handleSuggestionClickSecond = (selectedValue: string) => {
+        secondInput.setValue(selectedValue);
+        secondInput.setShowSuggestions(false);
+    };
+
+    const handleInputBlur = (inputType: 'first' | 'second') => {
         setTimeout(() => {
-        setShowSuggestions(false);
+            if (inputType === 'first') {
+                firstInput.setShowSuggestions(false);
+            } else {
+                secondInput.setShowSuggestions(false);
+            }
         }, 200);
     };
 
-    const handleInputFocus = () => {
-        if (suggestions.length > 0) {
-        setShowSuggestions(true);
+    const handleInputFocus = (inputType: 'first' | 'second') => {
+        if (inputType === 'first') {
+            if (firstInput.movies.length > 0 || firstInput.genres.length > 0) {
+                firstInput.setShowSuggestions(true);
+            }
+        } else {
+            if (secondInput.movies.length > 0) {
+                secondInput.setShowSuggestions(true);
+            }
         }
     };
 
@@ -105,73 +86,139 @@ export default function FormOption(option: Option) {
                     {isCompareMode ? 'First Movie' : isSearchTagMode ? 'Tag Movie' : 'Movie Title'}
                 </label>
                 <input
-                    ref={inputRef}
+                    ref={inputRefFirst}
                     id={option.text}
                     type="text"
                     name={option.text}
-                    value={value}
+                    value={firstInput.value}
                     placeholder={option.placeholder1}
                     className="w-full px-4 py-3 bg-gray-900/60 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all placeholder-gray-500"
-                    onChange={handleChange}
-                    onFocus={handleInputFocus}
-                    onBlur={handleInputBlur}
+                    onChange={handleChangeFirst}
+                    onFocus={() => handleInputFocus('first')}
+                    onBlur={() => handleInputBlur('first')}
                     autoComplete="off"
                 />
                 
-                {showSuggestions && suggestions.length > 0 && (
+                {firstInput.showSuggestions && (firstInput.movies.length > 0 || firstInput.genres.length > 0) && (
                     <div 
-                        ref={dropdownRef}
+                        ref={dropdownRefFirst}
                         className="absolute z-10 w-full mt-1 bg-gray-900/95 border border-gray-700 rounded-lg shadow-xl max-h-60 overflow-y-auto backdrop-blur-sm">
-                    {loading ? (
+                    {firstInput.loading ? (
                         <div className="px-4 py-3 text-gray-400 text-center">
                         Cargando...
                         </div>
                     ) : (
                         <ul className="py-2">
-                        {suggestions.map((movie) => (
-                            <li key={movie.movie_id}>
-                            <button
-                                
-                                type="button"
-                                className="w-full px-4 py-3 text-left hover:bg-gray-800/80 transition-colors duration-150 flex items-center gap-3"
-                                onClick={() => handleSuggestionClick(movie.title)}
-                            >
-                                <span className="flex-1 truncate">{movie.title}</span>
-                                <span className="text-xs text-gray-500 bg-gray-800 px-2 py-1 rounded">
-                                ID: {movie.movie_id}
-                                </span>
-                            </button>
-                            </li>
-                        ))}
+                        {isSearchTagMode ? (
+                            <div className="py-2">
+                                {firstInput.genres.map((genre, index) => (
+                                    <li key={index}>
+                                        <button
+                                            type="button"
+                                            className="w-full px-4 py-3 text-left hover:bg-gray-800/80 transition-colors duration-150 flex items-center gap-3"
+                                            onClick={() => handleSuggestionClickFirst(genre)}
+                                        >
+                                            <span className="flex-1 truncate">{genre}</span>
+                                        </button>
+                                    </li>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="py-2">
+                                {firstInput.movies.map((movie) => (
+                                    <li key={movie.movie_id}>
+                                    <button
+                                        
+                                        type="button"
+                                        className="w-full px-4 py-3 text-left hover:bg-gray-800/80 transition-colors duration-150 flex items-center gap-3"
+                                        onClick={() => handleSuggestionClickFirst(movie.title)}
+                                    >
+                                        <span className="flex-1 truncate">{movie.title}</span>
+                                        <span className="text-xs text-gray-500 bg-gray-800 px-2 py-1 rounded">
+                                        ID: {movie.movie_id}
+                                        </span>
+                                    </button>
+                                    </li>
+                                ))}
+                            </div>
+                        )}
                         </ul>
                     )}
                     </div>
                 )}
 
-                {showSuggestions && !loading && suggestions.length === 0 && debouncedValue.length >= 2 && (
-                    <div className="absolute z-10 w-full mt-1 bg-gray-900/95 border border-gray-700 rounded-lg shadow-xl backdrop-blur-sm">
-                    <div className="px-4 py-3 text-gray-400 text-center">
-                        No se encontraron películas
-                    </div>
-                    </div>
-                )}
+                {firstInput.showSuggestions && !firstInput.loading && 
+                    firstInput.movies.length === 0 && 
+                    firstInput.genres.length === 0 && 
+                    firstInput.debouncedValue.length >= 2 && (
+                        <div className="absolute z-10 w-full mt-1 bg-gray-900/95 border border-gray-700 rounded-lg shadow-xl backdrop-blur-sm">
+                            <div className="px-4 py-3 text-gray-400 text-center">
+                                {isSearchTagMode ? 'No se encontraron géneros/tags' : 'No se encontraron películas'}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {isCompareMode && option.placeholder2 && (
-                <div className="animate-slideDown">
-                    <label htmlFor="compare-movie" className="block text-sm font-medium text-gray-300 mb-2">
-                    Second Movie
-                    </label>
-                    <input
-                    id="compare-movie"
-                    type="text"
-                    name="compare-movie"
-                    placeholder={option.placeholder2}
-                    className="w-full px-4 py-3 bg-gray-900/60 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all placeholder-gray-500"
-                    />
-                </div>
-                )}
+                    <div className="animate-slideDown">
+                        <label htmlFor="compare-movie" className="block text-sm font-medium text-gray-300 mb-2">
+                        Second Movie
+                        </label>
+                        <input
+                            ref={inputRefSecond}
+                            id="compare-movie"
+                            type="text"
+                            name="compare-movie"
+                            value={secondInput.value}
+                            placeholder={option.placeholder2}
+                            onChange={handleChangeSecond}
+                            onFocus={() => handleInputFocus('second')}
+                            onBlur={() => handleInputBlur('second')}
+                            className="w-full px-4 py-3 bg-gray-900/60 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all placeholder-gray-500"
+                        />
+                    </div>
+                    )}
             </div>
+                
+
+            {secondInput.showSuggestions && secondInput.movies.length > 0 && (
+                <div 
+                    ref={dropdownRefSecond}
+                    className="absolute z-10 w-full mt-1 bg-gray-900/95 border border-gray-700 rounded-lg shadow-xl max-h-60 overflow-y-auto backdrop-blur-sm">
+                    {secondInput.loading ? (
+                        <div className="px-4 py-3 text-gray-400 text-center">
+                            Cargando...
+                        </div>
+                    ) : (
+                        <ul className="py-2">
+                            {secondInput.movies.map((movie) => (
+                                <li key={movie.movie_id}>
+                                    <button
+                                        type="button"
+                                        className="w-full px-4 py-3 text-left hover:bg-gray-800/80 transition-colors duration-150 flex items-center gap-3"
+                                        onClick={() => handleSuggestionClickSecond(movie.title)}
+                                    >
+                                        <span className="flex-1 truncate">{movie.title}</span>
+                                        <span className="text-xs text-gray-500 bg-gray-800 px-2 py-1 rounded">
+                                            ID: {movie.movie_id}
+                                        </span>
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
+            )}
+
+            {secondInput.showSuggestions && !secondInput.loading && 
+             secondInput.movies.length === 0 && 
+             secondInput.debouncedValue.length >= 2 && (
+                <div className="absolute z-10 w-full mt-1 bg-gray-900/95 border border-gray-700 rounded-lg shadow-xl backdrop-blur-sm">
+                    <div className="px-4 py-3 text-gray-400 text-center">
+                        No se encontraron películas
+                    </div>
+                </div>
+            )}
 
             <button
                 type="button"
