@@ -45,7 +45,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white p-4">
-      <div className='max-w-2xl mx-auto'>
+      <div className='max-w-4xl mx-auto'>
         <header className='text-center mb-8 pt-8'>
           <h1 className='text-4xl font-bold mb-2 bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent'>
             Movie Recommendations
