@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useMovieSearch } from "../../hooks/useMovieSearch";
-import { getMoviesRecomendationByMovieTitle } from "../../services/recomentsMovies.service";
+import { getMoviesRecomendationByGenres, getMoviesRecomendationByMovieTitle } from "../../services/recomentsMovies.service";
 import type { recomnedResponse } from "../../models/recoments.model";
 import type { Option } from "../../models/options.model";
 
@@ -44,7 +44,7 @@ export default function FormOption(option: Option) {
         } else {
             setMoviesRecomendations(null)
         }
-    })
+    }, [option.select])
 
     const handleChangeFirst = (e: React.ChangeEvent<HTMLInputElement>) => {
         firstInput.setValue(e.target.value);
@@ -133,7 +133,16 @@ export default function FormOption(option: Option) {
     };
 
     const handleTagMode = async () => {
-        console.log("Proximamente Genres mode")
+        const tags = firstInput.value.split(',').map(tag => tag.trim()).filter(tag => tag);
+    
+        const recomendMovies = await getMoviesRecomendationByGenres(tags, 6);
+        
+        if (!recomendMovies.recommendations || recomendMovies.recommendations.length === 0) {
+            throw new Error("No se encontraron películas para este género/tag");
+        }
+        
+        setMoviesRecomendations(recomendMovies);
+
     };
 
     const handleCompareMode = async () => {
