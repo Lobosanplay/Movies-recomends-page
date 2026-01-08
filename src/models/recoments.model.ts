@@ -1,5 +1,6 @@
 export interface recomnedResponse {
     query: string;
+    query_tags?: string[];
     limit: number;
     found_movies: number;
     recommendations: recomnedData[]
