@@ -1,4 +1,5 @@
 import type { compareResponse } from "../../../models/compare.model";
+import MoviePoster from "./MoviePoster";
 
 interface CompareResultsProps {
     compareResult: compareResponse | null;
@@ -6,11 +7,11 @@ interface CompareResultsProps {
     secondMovie: string;
 }
 
-export const CompareResults = ({
+export default function CompareResults ({
     compareResult,
     firstMovie,
     secondMovie
-}: CompareResultsProps) => {
+}: CompareResultsProps) {
     if (!compareResult) return null;
 
     const similarityScore = compareResult.similarity_score;
@@ -69,6 +70,12 @@ export const CompareResults = ({
                             </div>
                             <div className="text-4xl opacity-20 group-hover:opacity-30 transition-opacity">🎬</div>
                         </div>
+                        <div className="mt-2">
+                            <MoviePoster
+                                title={firstMovie}
+                                className="w-full h-48 object-cover rounded-lg"
+                            />
+                        </div>
                         <div className="mt-4 pt-4 border-t border-gray-800">
                             <div className="text-sm text-gray-400">
                                 <span className="text-orange-400 font-medium">Comparando con:</span> {secondMovie}
@@ -91,6 +98,12 @@ export const CompareResults = ({
                                 </div>
                             </div>
                             <div className="text-4xl opacity-20 group-hover:opacity-30 transition-opacity">🎬</div>
+                        </div>
+                        <div className="mt-2">
+                            <MoviePoster
+                                title={secondMovie}
+                                className="w-full h-48 object-cover rounded-lg"
+                            />
                         </div>
                         <div className="mt-4 pt-4 border-t border-gray-800">
                             <div className="flex items-center justify-between">

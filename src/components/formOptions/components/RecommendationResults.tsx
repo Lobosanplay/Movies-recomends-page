@@ -1,14 +1,15 @@
 import type { recomnedResponse } from "../../../models/recoments.model";
+import MoviePoster from "./MoviePoster";
 
 interface RecommendationResultsProps {
     moviesRecomendations: recomnedResponse | null;
     isSearchTagMode: boolean;
 }
 
-export const RecommendationResults = ({ 
+export default function RecommendationResults({ 
     moviesRecomendations, 
     isSearchTagMode 
-}: RecommendationResultsProps) => {
+}: RecommendationResultsProps) {
     if (!moviesRecomendations) return null;
 
     if (isSearchTagMode) {
@@ -32,6 +33,12 @@ export const RecommendationResults = ({
                                 </div>
                             </div>
                             <h4 className="font-semibold text-lg mb-2">{movie.title}</h4>
+                             <div className="mt-2">
+                                <MoviePoster
+                                    title={movie.title}
+                                    className="w-full h-48 object-cover rounded-lg"
+                                />
+                            </div>
                             <div className="text-xs text-gray-500 mt-4 pt-3 border-t border-gray-800/50">
                                 ID: {movie.movie_id}
                             </div>
@@ -72,6 +79,13 @@ export const RecommendationResults = ({
                         </div>
                         
                         <h4 className="font-semibold text-lg mb-2 line-clamp-1">{movie.title}</h4>
+
+                        <div className="mt-2">
+                            <MoviePoster
+                                title={movie.title}
+                                className="w-full h-48 object-cover rounded-lg"
+                            />
+                        </div>
                         
                         <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-800/50">
                             <div className="text-xs text-gray-400">

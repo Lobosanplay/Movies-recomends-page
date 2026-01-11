@@ -2,7 +2,7 @@ interface ErrorDisplayProps {
     error: string | null;
 }
 
-export const ErrorDisplay = ({ error }: ErrorDisplayProps) => {
+export default function ErrorDisplay({ error }: ErrorDisplayProps){
     if (!error) return null;
 
     return (
