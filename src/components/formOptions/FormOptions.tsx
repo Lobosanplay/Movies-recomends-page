@@ -6,11 +6,11 @@ import type { recomnedResponse } from "../../models/recoments.model";
 import type { compareResponse } from "../../models/compare.model";
 import type { Option } from "../../models/options.model";
 
-import { MovieInput } from "./components/MovieInput";
-import { SubmitButton } from "./components/SubmitButton";
-import { ErrorDisplay } from "./components/ErrorDisplay";
-import { RecommendationResults } from "./components/RecommendationResults";
-import { CompareResults } from "./components/CompareResults";
+import MovieInput from "./components/MovieInput";
+import SubmitButton from "./components/SubmitButton";
+import ErrorDisplay from "./components/ErrorDisplay";
+import RecommendationResults from "./components/RecommendationResults";
+import CompareResults from "./components/CompareResults";
 
 export default function FormOption(option: Option) {
     const isCompareMode = option.select === 'compare';
@@ -45,8 +45,10 @@ export default function FormOption(option: Option) {
         if (isSearchTagMode) {
             firstInput.setValue('');
             setMoviesRecomendations(null);
+            setCompareResult(null)
         } else {
             setMoviesRecomendations(null);
+            setCompareResult(null)
         }
     }, [option.select, isSearchTagMode]);
 

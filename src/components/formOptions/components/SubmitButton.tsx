@@ -3,7 +3,7 @@ interface SubmitButtonProps {
     isCompareMode: boolean;
 }
 
-export const SubmitButton = ({ isLoading, isCompareMode }: SubmitButtonProps) => {
+export default function SubmitButton({ isLoading, isCompareMode }: SubmitButtonProps) {
     return (
         <button
             type="submit"

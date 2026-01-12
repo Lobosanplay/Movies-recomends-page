@@ -18,7 +18,7 @@ interface MovieInputProps {
     ref?: React.Ref<HTMLInputElement>;
 }
 
-export const MovieInput = ({
+export default function MovieInput({
     id,
     label,
     placeholder,
@@ -33,7 +33,7 @@ export const MovieInput = ({
     onSuggestionClick,
     isTagMode = false,
     ref
-}: MovieInputProps) => {
+}: MovieInputProps){
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     return (
