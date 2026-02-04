@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { useMovieSearch } from "../../hooks/useMovieSearch";
+import { useMovieSearch } from "../../shared/hooks/useMovieSearch";
 import {
   getMoviesRecomendationByGenres,
   getMoviesRecomendationByMovieTitle,
-} from "../../services/recomentsMovies.service";
-import { compareMovies } from "../../services/compareMovies.service";
-import type { recomnedResponse } from "../../models/recoments.model";
-import type { compareResponse } from "../../models/compare.model";
-import type { Option } from "../../models/options.model";
+} from "../../shared/services/recomentsMovies.service";
+import { compareMovies } from "../../shared/services/compareMovies.service";
+import type { recomnedResponse } from "../../shared/models/recoments.model";
+import type { compareResponse } from "../../shared/models/compare.model";
+import type { Option } from "../../shared/models/options.model";
 
 import MovieInput from "./components/MovieInput";
 import SubmitButton from "./components/SubmitButton";

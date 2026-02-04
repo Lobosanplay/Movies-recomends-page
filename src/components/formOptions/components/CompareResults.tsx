@@ -1,4 +1,4 @@
-import type { compareResponse } from "../../../models/compare.model";
+import type { compareResponse } from "../../../shared/models/compare.model";
 import MoviePoster from "./MoviePoster";
 
 interface CompareResultsProps {
