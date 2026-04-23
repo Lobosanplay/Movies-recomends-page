@@ -1,12 +1,14 @@
 import type { compareResponse } from "../models/compare.model";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export const compareMovies = async (
   movie1: string,
   movie2: string,
 ): Promise<compareResponse> => {
   try {
     const response = await fetch(
-      `http://127.0.0.1:8000/api/v1/compare?movie1=${movie1}&movie2=${movie2}`,
+      `${API_URL}api/v1/compare?movie1=${movie1}&movie2=${movie2}`,
     );
     if (!response.ok) {
       throw new Error("Error en la respuesta del servidor");
