@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import type { Movie } from "../../../models/search.models";
+import type { Movie } from "../../../shared/models/search.models";
 
 interface MovieInputProps {
   id: string;

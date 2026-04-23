@@ -1,4 +1,4 @@
-import type { recomnedResponse } from "../../../models/recoments.model";
+import type { recomnedResponse } from "../../../shared/models/recoments.model";
 import MoviePoster from "./MoviePoster";
 
 interface RecommendationResultsProps {

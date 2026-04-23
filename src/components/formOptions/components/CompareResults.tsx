@@ -1,17 +1,11 @@
-import type { compareResponse } from "../../../models/compare.model";
+import type { compareResponse } from "../../../shared/models/compare.model";
 import MoviePoster from "./MoviePoster";
 
 interface CompareResultsProps {
   compareResult: compareResponse | null;
-  firstMovie: string;
-  secondMovie: string;
 }
 
-export default function CompareResults({
-  compareResult,
-  firstMovie,
-  secondMovie,
-}: CompareResultsProps) {
+export default function CompareResults({ compareResult }: CompareResultsProps) {
   if (!compareResult) return null;
 
   const similarityScore = compareResult.similarity_score;
@@ -45,11 +39,11 @@ export default function CompareResults({
               Comparación de Películas:
             </h3>
             <span className="px-3 py-1 bg-orange-900/50 rounded-full text-orange-300 font-medium">
-              {firstMovie}
+              {compareResult.movie1}
             </span>
             <span className="text-gray-400">vs</span>
             <span className="px-3 py-1 bg-red-900/50 rounded-full text-red-300 font-medium">
-              {secondMovie}
+              {compareResult.movie2}
             </span>
           </div>
         </div>
@@ -68,7 +62,7 @@ export default function CompareResults({
                     Película 1
                   </div>
                   <h5 className="text-lg font-bold text-orange-300">
-                    {firstMovie}
+                    {compareResult.movie1}
                   </h5>
                 </div>
               </div>
@@ -78,7 +72,7 @@ export default function CompareResults({
             </div>
             <div className="mt-2">
               <MoviePoster
-                title={firstMovie}
+                title={compareResult.movie1}
                 className="w-full h-48 object-cover rounded-lg"
               />
             </div>
@@ -87,7 +81,7 @@ export default function CompareResults({
                 <span className="text-orange-400 font-medium">
                   Comparando con:
                 </span>{" "}
-                {secondMovie}
+                {compareResult.movie1}
               </div>
             </div>
           </div>
@@ -106,7 +100,7 @@ export default function CompareResults({
                     Película 2
                   </div>
                   <h5 className="text-lg font-bold text-red-300">
-                    {secondMovie}
+                    {compareResult.movie2}
                   </h5>
                 </div>
               </div>
@@ -116,7 +110,7 @@ export default function CompareResults({
             </div>
             <div className="mt-2">
               <MoviePoster
-                title={secondMovie}
+                title={compareResult.movie2}
                 className="w-full h-48 object-cover rounded-lg"
               />
             </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getPosterImage } from "../../../services/getPosteImage.service";
+import { getPosterImage } from "../../../shared/services/getPosteImage.service";
 
 interface MoviePosterProps {
   title: string;
