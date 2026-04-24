@@ -51,15 +51,17 @@ export default function FormOption(option: Option) {
   }, [secondInput]);
 
   useEffect(() => {
+    setMoviesRecomendations(null);
+    setCompareResult(null);
     if (isSearchTagMode) {
       firstInput.setValue("");
-      setMoviesRecomendations(null);
-      setCompareResult(null);
-    } else {
-      setMoviesRecomendations(null);
-      setCompareResult(null);
     }
-  }, [option.select, isSearchTagMode, firstInput]);
+
+    if (isCompareMode) {
+      firstInput.setValue("");
+      secondInput.setValue("");
+    }
+  }, [option.select, isSearchTagMode, isCompareMode]);
 
   const handleChangeFirst = (e: React.ChangeEvent<HTMLInputElement>) => {
     firstInput.setValue(e.target.value);
@@ -160,6 +162,7 @@ export default function FormOption(option: Option) {
       .split(",")
       .map((tag) => tag.trim())
       .filter((tag) => tag);
+
     const recomendMovies = await getMoviesRecomendationByGenres(tags, 6);
 
     if (
@@ -168,7 +171,6 @@ export default function FormOption(option: Option) {
     ) {
       throw new Error("No se encontraron películas para este género/tag");
     }
-    console.log(recomendMovies);
     setMoviesRecomendations(recomendMovies);
   };
 
@@ -213,23 +215,24 @@ export default function FormOption(option: Option) {
 
         {isCompareMode && option.placeholder2 && (
           <div className="animate-slideDown">
-            <label
-              htmlFor="compare-movie"
-              className="block text-sm font-medium text-gray-300 mb-2"
-            >
-              Second Movie
-            </label>
-            <input
-              ref={inputRefSecond}
+            <MovieInput
               id="compare-movie"
-              type="text"
-              name="compare-movie"
-              value={secondInput.value}
+              label="Second Movie"
               placeholder={option.placeholder2}
+              value={secondInput.value}
               onChange={handleChangeSecond}
               onFocus={() => handleInputFocus("second")}
               onBlur={() => handleInputBlur("second")}
-              className="w-full px-4 py-3 bg-gray-900/60 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all placeholder-gray-500"
+              suggestions={secondInput.movies}
+              genres={[]}
+              showSuggestions={secondInput.showSuggestions}
+              loading={secondInput.loading}
+              onSuggestionClick={(selectedValue) => {
+                secondInput.setValue(selectedValue);
+                secondInput.setShowSuggestions(false);
+              }}
+              isTagMode={false}
+              ref={inputRefSecond}
             />
           </div>
         )}
@@ -244,11 +247,7 @@ export default function FormOption(option: Option) {
         isSearchTagMode={isSearchTagMode}
       />
 
-      <CompareResults
-        compareResult={compareResult}
-        firstMovie={firstInput.value}
-        secondMovie={secondInput.value}
-      />
+      <CompareResults compareResult={compareResult} />
 
       {!moviesRecomendations && !compareResult && !isLoading && !error && (
         <div className="mt-8 text-center p-8 border-2 border-dashed border-gray-700/50 rounded-xl">

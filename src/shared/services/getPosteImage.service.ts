@@ -1,9 +1,9 @@
-const apiKey = import.meta.env.VITE_APIKEY;
+const OMDBAPI_KEY = import.meta.env.VITE_OMDBAPI_KEY;
 
 export const getPosterImage = async (title: string): Promise<string> => {
   try {
     const response = await fetch(
-      `http://www.omdbapi.com/?t=${encodeURIComponent(title)}&apikey=${apiKey}`,
+      `http://www.omdbapi.com/?t=${encodeURIComponent(title)}&apikey=${OMDBAPI_KEY}`,
     );
 
     const data = await response.json();
